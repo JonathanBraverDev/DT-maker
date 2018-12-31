@@ -1,0 +1,4 @@
+(define (entropyCalc posivives negatives N)
+  (- (* (/ (* -1 positives) N) (log (/ posivives N) 2))
+     (* (/ (* -1 negatives) N) (log (/ negatives N) 2))
+  ))
