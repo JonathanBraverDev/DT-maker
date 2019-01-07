@@ -105,7 +105,7 @@
     (5.8 2.7 5.1 1.9 "Iris-virginica")  
     (7.1 3.0 5.9 2.1 "Iris-virginica")  
     (6.3 2.9 5.6 1.8 "Iris-virginica")  
-    (6.5 3.0 5.8 2.2 "Iris-virginica")  
+    (6.5 3.0 5.8 2.2 "Iris-virginica") 
     (7.6 3.0 6.6 2.1 "Iris-virginica")  
     (4.9 2.5 4.5 1.7 "Iris-virginica")  
     (7.3 2.9 6.3 1.8 "Iris-virginica")  
@@ -161,3 +161,20 @@
 (define (devideByparameter num)
   (group-by (lambda (case) (list-ref case num)) (sort set < #:key (lambda (case) (list-ref case num)))))
 
+
+(define (testDevision parameter value)
+  (define list (devideByparameter parameter))
+  (entropyCalc (allBelow list 0 parameter value) (allAbove list 0 parameter value)))
+
+(define (allAbove list index parameter value)
+  (cond
+    ((= index (length list)) 0)
+    ((< (list-ref (first (list-ref list index)) parameter) value) (+ (length (list-ref list index)) (allAbove list (add1 index) parameter value)))
+    (else (allAbove list (add1 index) parameter value))))
+
+
+(define (allBelow list index parameter value) ;also includes the exact value
+  (cond
+    ((= index (length list)) 0)
+    ((>= (list-ref (first (list-ref list index)) parameter) value) (+ (length (list-ref list index)) (allBelow list (add1 index) parameter value)))
+    (else (allBelow list (add1 index) parameter value))))
