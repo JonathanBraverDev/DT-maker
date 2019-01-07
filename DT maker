@@ -152,45 +152,12 @@
     (6.2 3.4 5.4 2.3 "Iris-virginica")  
     (5.9 3.0 5.1 1.8 "Iris-virginica")))
 
-(define (entropyCalc positives negatives N)
-  (- (* (/ (* -1 positives) N) (log (/ positives N) 2))
-     (* (/ (* -1 negatives) N) (log (/ negatives N) 2))
+(define (entropyCalc positives negatives)
+  (define N (+ positives negatives))
+  (+ (-(* (/ (* -1 positives) N) (log (/ positives N) 2)))
+     (-(* (/ (* -1 negatives) N) (log (/ negatives N) 2)))
      ))
 
-(define (ranges types parameter valueAccuracy) ;all numbers
-  (cond
-    ((= 1 1) 0)
-    (else 2)))
+(define (devideByparameter num)
+  (group-by (lambda (case) (list-ref case num)) (sort set < #:key (lambda (case) (list-ref case num)))))
 
-;(define (separeteClass data index classifier) ;data is the data-set, index is 0, classifier is the clasification of the sepatered items
-;  (cond
-;    ((= index (length data)) '())
-;    ((equal? (first (reverse (list-ref data index))) classifier) (cons (list-ref data index) (separeteClass data (add1 index) classifier)))
-;    (else (separeteClass data (add1 index) classifier))))
-
-;better then the one above
-(define (separateParameter data index parameterNum targetValue) ;data is the data-set, index is 0, parameterNum is the index (from 0) of the patemeter, targetValue is the... target value...
-  (cond
-    ((= index (length data)) '())
-    ((equal? (list-ref (list-ref data index) parameterNum) targetValue) (cons (list-ref data index) (separateParameter data (add1 index) parameterNum targetValue)))
-    (else (separateParameter data (add1 index) parameterNum targetValue))))
-
-(define (rangeOfParameter data parameterNum minvalue maxValue accuracy) ;data is the data-set, minvalue and maxValue define the range od the serach, accuracy is the increse in value each cycle
-  (cond
-    ((exact-integer? minvalue) ;WIP!!!!!!!!!!!!!!!
-    (else
-     (cond                                ;the resuld wond include the minValue or maxVlaue, only inbetween
-       ((not (< minvalue maxValue)) '())
-       (else (append (separateParameter data 0 parameterNum minvalue) (rangeOfParameter data parameterNum (+ minvalue accuracy) maxValue accuracy)))))))
-
-;all numbers must be 'non-exact'
-
-#|
-(define (rangeOfParameter data parameterNum minValue maxValue accuracy) ;data is the data-set, minvalue and maxValue define the range od the serach, accuracy is the increse in value each cycle
-  (filter (lambda (case)
-              (and (< minValue (list-ref case parameterNum))
-                   (> maxValue (list-ref case parameterNum))))
-          (group-by (lambda (case)
-              (list-ref case parameterNum))
-            set)))
-|#
