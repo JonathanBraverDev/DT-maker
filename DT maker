@@ -152,11 +152,29 @@
     (6.2 3.4 5.4 2.3 "Iris-virginica")  
     (5.9 3.0 5.1 1.8 "Iris-virginica")))
 
-(define (entropyCalc positives negatives)
-  (define N (+ positives negatives))
-  (+ (-(* (/ (* -1 positives) N) (log (/ positives N) 2)))
-     (-(* (/ (* -1 negatives) N) (log (/ negatives N) 2)))
+(define (entropyCalc x y z)
+  (define N (+ x y z))
+  (+ (- (* (/ x N) (log* (/ x N) 2)))
+     (- (* (/ y N) (log* (/ y N) 2)))
+     (- (* (/ z N) (log* (/ z N) 2)))
      ))
+
+(define (log* num base)
+  (cond
+    ((= num 0) 0)
+    (else (log num base))))
+
+(define (informationGain Y)
+  (- (entropyCalc 50 50 50) (entropyCalc (countType data 0 4 "Iris-setosa")
+                                         (countType data 0 4 "Iris-versicolor")
+                                         (countType data 0 4 "Iris-virginica"))))
+     
+(define (countType data index position type)
+  (cond
+    ((= index (length set)) 0)
+    ((equal? type (list-ref (list-ref set index) position)) (add1 (countType set (add1 index) position type)))
+    (else (countType set (add1 index) position type))))
+
 
 (define (devideByparameter num)
   (group-by (lambda (case) (list-ref case num)) (sort set < #:key (lambda (case) (list-ref case num)))))
