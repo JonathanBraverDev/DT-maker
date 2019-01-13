@@ -111,7 +111,7 @@
 ; 6 - 8
 ; 7 - 10
 
-(define baseEntropy 2.3905596822940396) ;(entropyCalc 41 20 5 13 4 8 10)
+;(define baseEntropy 2.3905596822940396) ;(entropyCalc 41 20 5 13 4 8 10)
 
 (define (entropyCalc p1 p2 p3 p4 p5 p6 p7)
   (define N (+ p1 p2 p3 p4 p5 p6 p7))
@@ -136,42 +136,49 @@
     (else (count data (add1 index) position value))))
 
 
-(define (devideByparameter set num)
-  (group-by (lambda (case) (list-ref case num)) (sort set < #:key (lambda (case) (list-ref case num)))))
+(define (devideByparameter data num)
+  (group-by (lambda (case) (list-ref case num)) (sort data < #:key (lambda (case) (list-ref case num)))))
 
 
-(define (totalEntropy list) ;list is (devideByparameter set num)
+(define (totalEntropy data) ;data is (devideByparameter set num)
   (cond
-    ((empty? (rest list)) (calceEntropyFromlist (first list)))
-    (else (calceEntropyFromlist (first list)) + (totalEntropy (rest list)))))
+    ((empty? (rest data)) (calceEntropyFromData (first data)))
+    (else (+ (calceEntropyFromData (first data)) (totalEntropy (rest data))))))
 
 (define (informationGain baseEntropy splittedEntropy)
   (- baseEntropy splittedEntropy))
 
-(define (calceEntropyFromlist list)
-  (entropyCalc (count list 0 17 1)
-               (count list 0 17 2)
-               (count list 0 17 3)
-               (count list 0 17 4)
-               (count list 0 17 5)
-               (count list 0 17 6)
-               (count list 0 17 7)))
-     
-;---------------------------------------------------------------------------------
+(define (calceEntropyFromData data)
+  (entropyCalc (count data 0 17 1)
+               (count data 0 17 2)
+               (count data 0 17 3)
+               (count data 0 17 4)
+               (count data 0 17 5)
+               (count data 0 17 6)
+               (count data 0 17 7)))
 
-(define (testDevision set parameter value)
-  (define list (devideByparameter set  parameter))
-  (entropyCalc (allBelow list 0 parameter value) (allAbove list 0 parameter value)))
+(define (testDevision data parameter)
+  (define newData (devideByparameter data  parameter))
+  (informationGain (totalEntropy (list data)) (totalEntropy newData)))
 
-(define (allAbove list index parameter value)
+(define (listAllGains data parameter) ;defult is 1, ONLY becouse the first element isn't a number
   (cond
-    ((= index (length list)) 0)
-    ((< (list-ref (first (list-ref list index)) parameter) value) (+ (length (list-ref list index)) (allAbove list (add1 index) parameter value)))
-    (else (allAbove list (add1 index) parameter value))))
+    ((= parameter 16) '())
+    (else (cons (testDevision data parameter) (listAllGains data (add1 parameter))))))
 
+(define (bestSplit data) ;defult parameter is 0
+  (findBest (listAllGains data 1) 0 0 0))
 
-(define (allBelow list index parameter value) ;also includes the exact value
+(define (findBest list indexBest index bestGain) ;defult on all BUT list is 0
   (cond
-    ((= index (length list)) 0)
-    ((>= (list-ref (first (list-ref list index)) parameter) value) (+ (length (list-ref list index)) (allBelow list (add1 index) parameter value)))
-    (else (allBelow list (add1 index) parameter value))))
+    ((= index (length list)) (display "best index: ") (println (add1 indexBest)) (display "best gain: ") (print bestGain))
+    ((> (list-ref list index) bestGain) (findBest list index (add1 index) (list-ref list index)))
+    (else (findBest list indexBest (add1 index) bestGain))))
+
+
+
+;----------------------------------------------------------------------------------
+(define (TST info num)
+  (cond
+    ((= num 16) '())
+    (else (cons (totalEntropy (devideByparameter set num)) (TST info (add1 num))))))
